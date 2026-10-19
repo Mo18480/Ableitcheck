@@ -1,0 +1,78 @@
+{
+  "format": "ableitcheck-backup",
+  "version": 3,
+  "exportedAt": "2026-10-17T13:00:00Z",
+  "projects": [
+    {
+      "id": "pbeispielwinkel32",
+      "createdAt": "2026-10-16T13:31:15.246Z",
+      "updatedAt": "2026-10-16T19:52:06.603Z",
+      "closedAt": null,
+      "status": "entwurf",
+      "general": {
+        "address": "Beispiel aus V2 – automatische Dachneigung",
+        "owner": "",
+        "date": "2026-10-16",
+        "examiner": "",
+        "plant": "",
+        "caseType": "neu",
+        "power": "8",
+        "notes": ""
+      },
+      "building": {
+        "roof": "sattel",
+        "pitch": "",
+        "gable": "10",
+        "length": "8",
+        "eaves": "4",
+        "ridge": "6,5",
+        "chimney": "8",
+        "distRidge": "0,5",
+        "distEaves": "3,5",
+        "roofClearance": "",
+        "roofHorizontal": "",
+        "notes": "",
+        "pitchMode": "auto"
+      },
+      "openings": [
+        {
+          "id": "osu9ai2n",
+          "type": "Fenster",
+          "building": "Nr 55",
+          "distance": "12",
+          "top": "6"
+        }
+      ],
+      "openingsSurvey": "ja",
+      "neighbors": [
+        {
+          "id": "n08yfmqz",
+          "name": "Nr 55",
+          "roof": "sattel",
+          "pitch": "",
+          "gable": "10",
+          "length": "15",
+          "eaves": "6",
+          "ridge": "9",
+          "distance": "12,2",
+          "delta": "1",
+          "notes": "",
+          "pitchMode": "auto",
+          "positionNotes": "Lage anhand der tatsächlichen Gebäudeaufnahme nachtragen."
+        }
+      ],
+      "environment": {
+        "survey": "unk",
+        "larger": "unk",
+        "complex": "nein",
+        "slope": "unk",
+        "notes": "",
+        "accuracy": "unk"
+      },
+      "photos": [],
+      "finalNotes": "",
+      "schemaVersion": 32,
+      "migrationNotice": "Beispielprüfung aus V2. Direkte frühere Winkel wurden im Beispiel bewusst geleert; der Winkel stammt aus First-/Traufhöhe und Giebelbreite. Vor einer echten Beurteilung Daten und vollständige Umgebung neu prüfen."
+    }
+  ]
+}

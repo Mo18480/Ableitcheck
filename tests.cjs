@@ -1,0 +1,58 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const html=fs.readFileSync(__dirname+'/index.html','utf8');
+const single=fs.readdirSync(__dirname).find(f=>/^AbleitCheck_V[\d_]+\.html$/.test(f));
+let script=html.split('<script type="module">')[1].split('</script>')[0].replace(/\ninit\(\);/,'');
+const c={console,Date,Math,Number,String,JSON,structuredClone,setTimeout,clearTimeout,window:{addEventListener(){}}};vm.createContext(c);vm.runInContext(script,c);const a=c.AbleitCheckTest;
+let count=0;function t(desc,fn){fn();count++;console.log('OK '+desc)};
+const near=(n,x,tol=0.0001)=>assert(Math.abs(n-x)<tol,`${n} != ${x}`);
+function nb(x={}){return {...a.blankNeighbor(),roof:'sattel',pitchMode:'auto',gable:'10',eaves:'6',ridge:'9',distance:'12.2',delta:'1',...x}}
+t('Automatik: Nachbar Nr 55 Winkel 30.9638',()=>near(a.roofAngle(nb()).used,30.963756532,0.0001));
+t('Automatik: Dachneigungsfaktor 0.70',()=>assert.equal(a.quarterRadius(nb()).factor,.7));
+t('Automatik: Radius 11,1',()=>near(a.quarterRadius(nb()).radius,11.1));
+t('Automatik: Nachbarviertelkreis positiv',()=>assert.equal(a.neighborCheck(nb(),8).step2,'ok'));
+t('Eigengebäude: 26,565 Grad',()=>near(a.roofAngle({roof:'sattel',pitchMode:'auto',gable:'10',eaves:'4',ridge:'6.5',pitch:''}).used,26.565051,0.0001));
+t('Wahl gemessen 45 Grad setzt Faktor 0.5',()=>{const r=a.quarterRadius(nb({pitchMode:'measured',pitch:'45'}));assert.equal(r.factor,.5);near(r.radius,10.5)});
+t('Warnung bei widersprechenden Winkeln auch im Messmodus',()=>{const r=a.neighborCheck(nb({pitchMode:'measured',pitch:'45'}),8);assert.equal(r.status,'hinweis');assert.match(r.reason,/Widerspruch/)});
+t('Warnung bei widersprechenden Winkeln im Automatikmodus',()=>{const r=a.neighborCheck(nb({pitch:'45'}),8);assert.equal(r.step2,'ok');assert.equal(r.status,'hinweis');assert.match(r.reason,/Widerspruch/)});
+t('Durch Eingabe von korrekt gemessenem Winkel keine Warnung',()=>{const r=a.neighborCheck(nb({pitch:'30.96'}),8);assert.equal(r.status,'ok')});
+t('Nicht gleiche Faktoren auch bei kleiner Differenz warnen',()=>{const r=a.roofAngle(nb({pitchMode:'measured',pitch:'29.99',gable:String(6/Math.tan(30*Math.PI/180))}));assert(r.changesFactor);assert(r.conflict)});
+t('Fehlende Firsthöhe: Automatik offen',()=>assert.equal(a.roofAngle(nb({ridge:''})).status,'offen'));
+t('Ungültige Breite: Automatik offen',()=>assert.equal(a.roofAngle(nb({gable:'0'})).status,'offen'));
+t('Flachdach bleibt 0 Grad',()=>assert.equal(a.quarterRadius(nb({roof:'flach'})).factor,1));
+t('Sonderdächer ohne automatische Winkelfreigabe',()=>assert.equal(a.quarterRadius(nb({roof:'pult'})).status,'manuell'));
+t('20 Grad: Faktor 0.85',()=>{const a1=20*Math.PI/180;let x=nb({pitch:'',pitchMode:'auto',eaves:'8',ridge:'8.91',gable:String(2*.91/Math.tan(a1))});assert.equal(a.quarterRadius(x).factor,.85)});
+for(const [deg,f] of [[19.9,1.85],[29.9,.85],[30.1,.7],[44.9,.7],[45.1,.5],[60.1,.45]])t(`Winkel nahe Grenze ${deg}°`,()=>{const rise=4,gable=2*rise/Math.tan(deg*Math.PI/180);assert.equal(a.quarterRadius(nb({ridge:'10',eaves:'6',gable:String(gable),pitch:''})).factor,f)});
+t('Kein automatisches positives Ergebnis bei widersprüchlicher eigener Dachneigung',()=>{const b={roof:'sattel',pitchMode:'auto',pitch:'45',gable:'10',eaves:'4',ridge:'6.5',chimney:'8',distRidge:'0.5',distEaves:'3.5'};assert.equal(a.roofCheck({caseType:'neu'},b).status,'offen')});
+t('Schema-V3.1 importiert ohne automatische Winkeländerung',()=>{let p=a.blankProject();p.schemaVersion=31;delete p.building.pitchMode;p.neighbors=[nb({pitch:'45'})];delete p.neighbors[0].pitchMode;let q=a.normalizeProject(p);assert.equal(q.schemaVersion,32);assert.equal(q.building.pitchMode,'measured');assert.equal(q.neighbors[0].pitchMode,'measured')});
+t('Schema-V2 importiert mit alter Lage-Angabe und Bestand bewahrt',()=>{let p=a.blankProject();delete p.schemaVersion;p.neighbors=[nb({pitch:'45',location:'nein'})];delete p.neighbors[0].pitchMode;let q=a.normalizeProject(p);assert.equal(q.schemaVersion,32);assert.equal(q.neighbors[0].pitchMode,'measured');assert.match(q.neighbors[0].notes,/Altangabe/)});
+t('Neue Projekte automatisch, alte ohne Feld manuell',()=>{assert.equal(a.blankProject().building.pitchMode,'auto');assert.equal(a.roofAngle({roof:'sattel',pitch:'31',gable:'10',eaves:'6',ridge:'9'}).mode,'measured')});
+t('Viertelkreis SVG bleibt vorhanden',()=>{let n=nb({pitch:''}),r=a.neighborCheck(n,8),svg=a.quarterCircleSVG(n,r,8);assert.match(svg,/Kreis und Mündung maßstäblich/);assert.match(svg,/11,10/);assert(!/NaN|undefined/.test(svg))});
+t('Automatisch berechneter Winkel ist im Panel sichtbar',()=>assert.match(a.anglePanel(nb({pitch:''})),/30,96°/));
+
+// ===== V3.7: Gesetz, Schulung, Übungsdaten =====
+const req=(c,p)=>a.openingRequirement(c,p);
+t('Abs. 2 Umkreis 15/17/17/19/40 m, Überragung 1 m',()=>{assert.deepEqual([50,51,100,101,1000].map(p=>req('bestand',p).radius),[15,17,17,19,40]);assert.equal(req('bestand',500).over,1)});
+t('Abs. 1 Leistungsstufen nach § 19 Abs. 1 Satz 5',()=>{assert.deepEqual([[50,15,1],[50.1,17,2],[150,19,3],[200,21,3]].map(([p])=>[p,req('neu',p).radius,req('neu',p).over]),[[50,15,1],[50.1,17,2],[150,19,3],[200,21,3]]);assert.equal(req('neu',201).status,'manuell')});
+function proj(x={}){const p=a.blankProject();Object.assign(p.general,{address:'Teststr. 1',plant:'Kaminofen',power:'8',caseType:'neu'},x.general||{});Object.assign(p.building,{roof:'sattel',gable:'10',eaves:'4',ridge:'6.5',chimney:'8',distRidge:'0.5',distEaves:'3.5'},x.building||{});p.openings=x.openings||[];p.openingsSurvey=x.openingsSurvey||'ja';p.neighbors=x.neighbors||[];Object.assign(p.environment,{survey:'ja',larger:'nein',complex:'nein',slope:'ja',accuracy:'ja'},x.environment||{});return p}
+t('Öffnung genau auf der Radiusgrenze wird bewertet',()=>{const o=a.evaluate(proj({openings:[{...{id:'o1',type:'Fenster',building:'',distance:'15',top:'7.5'}}]})).openings;assert.equal(o.list[0].status,'nein')});
+t('Abs. 1 firstnah: a < b und Überragung > a',()=>{assert.equal(a.roofCheck({caseType:'neu'},proj().building).status,'ok');assert.equal(a.roofCheck({caseType:'neu'},proj({building:{distRidge:'1.6'}}).building).status,'nein');assert.equal(a.roofCheck({caseType:'neu'},proj({building:{distRidge:'4',distEaves:'1'}}).building).status,'nein')});
+t('Abs. 2 Dach > 20°: 2,30 m horizontal als Alternative',()=>{const b={...proj().building,chimney:'6.6',roofHorizontal:'2.3'};assert.equal(a.roofCheck({caseType:'bestand'},b).status,'ok');assert.equal(a.roofCheck({caseType:'bestand'},{...b,roofHorizontal:'2.2'}).status,'nein')});
+t('Abs. 2 Flachdach: 1 m von der Dachfläche',()=>{const b={roof:'flach',pitchMode:'auto',pitch:'',gable:'10',eaves:'6',ridge:'',chimney:'6.8',roofClearance:'1'};assert.equal(a.roofCheck({caseType:'bestand'},b).status,'ok');assert.equal(a.roofCheck({caseType:'bestand'},{...b,roofClearance:'0.8'}).status,'nein')});
+t('Abs. 1 Flachdach nach Übung 3: fiktiver 20°-First + 0,40 m',()=>{const b={roof:'flach',pitchMode:'auto',pitch:'',gable:'33',eaves:'14',ridge:'',chimney:'20.41',distRidge:'',distEaves:''};const r=a.roofCheck({caseType:'neu'},b);near(r.values.targetRidge,20.006,0.001);assert.equal(r.status,'ok');assert.equal(a.roofCheck({caseType:'neu'},{...b,chimney:'20.3'}).status,'nein')});
+t('Abs. 1 Satteldach 5° (Frühjahrsweiterbildung): Firstnähe real, Höhe fiktiv',()=>{const ridge=5+5*Math.tan(5*Math.PI/180);const b={roof:'sattel',pitchMode:'auto',pitch:'',gable:'10',eaves:'5',ridge:String(ridge),chimney:'9.7',distRidge:'2.8',distEaves:'7.2'};assert.equal(a.roofCheck({caseType:'neu'},b).status,'ok');assert.equal(a.roofCheck({caseType:'neu'},{...b,chimney:'9.5'}).status,'nein')});
+t('Prüfschritt 1 positiv, Kreis innen → Grenzfall statt grün',()=>{const r=a.neighborCheck(nb({gable:'10',eaves:'8',ridge:'12',distance:'4',delta:'0'}),'12.5');assert.equal(r.step1,'ok');assert.equal(r.step2,'nein');assert.equal(r.status,'hinweis')});
+const H=[[13.4,7.5,11.5,31],[12.7,3.4,6.8,28],[11.3,6.7,10.4,33],[9.9,3.4,7.0,36],[15.6,6.1,11.0,32]];
+t('Übung 6: berechnete Dachneigungen ±1° zu den Schulungswerten',()=>H.forEach(([g,e,r,w])=>assert(Math.abs(a.roofAngle({roof:'sattel',pitchMode:'auto',gable:String(g),eaves:String(e),ridge:String(r),pitch:''}).used-w)<1)));
+t('Übung 6 Haus 5 (Δh +1,7 m, d 9,2 m): Schritt 1 und 2 negativ → VDI',()=>{const n=nb({gable:'15.6',eaves:'6.1',ridge:'11',distance:'9.2',delta:'1.7'});const r=a.neighborCheck(n,'10.8');assert.equal(r.step1,'nein');near(r.radius,14.43,0.001);assert.equal(r.step2,'nein');assert.equal(r.status,'vdi');assert.equal(a.evaluate(proj({building:{chimney:'10.8',ridge:'10.4',eaves:'6.7',gable:'11.3',distRidge:'0',distEaves:'5.65'},neighbors:[n]})).lai.status,'vdi')});
+t('Übung 6 Haus 1 (Δh −2,1 m): Hanglage abwärts, beide Schritte positiv',()=>{const r=a.neighborCheck(nb({gable:'13.4',eaves:'7.5',ridge:'11.5',distance:'25.4',delta:'-2.1'}),'10.8');assert.equal(r.step1,'ok');near(r.mouthHeightNeighbor,12.9);assert.equal(r.step2,'ok');assert.equal(r.status,'ok')});
+t('Mündung unter Nachbargelände → Einzelprüfung',()=>assert.equal(a.neighborCheck(nb({delta:'9'}),'8').status,'manuell'));
+t('Vollständiger Abs.-1-Fall ohne Auffälligkeit',()=>{const c=a.evaluate(proj({neighbors:[nb()]}));assert.equal(c.overall,'ok')});
+t('Unverhältnismäßigkeit: Prüffolge LIV-Arbeitshilfe 2023',()=>{const e=x=>a.effectiveCase({caseType:'unverh',uvBuilt:'ja',uv1:'unk',uv2:'unk',uv3:'unk',uv4:'unk',...x}).type;assert.equal(e({uvBuilt:'unk'}),'');assert.equal(e({uvBuilt:'nein'}),'neu');assert.equal(e({uv1:'ja'}),'neu');assert.equal(e({uv1:'nein',uv2:'ja'}),'bestand');assert.equal(e({uv1:'nein',uv2:'nein',uv3:'ja'}),'neu');assert.equal(e({uv1:'nein',uv2:'nein',uv3:'nein',uv4:'ja'}),'bestand');assert.equal(e({uv1:'nein',uv2:'nein',uv3:'nein',uv4:'nein'}),'neu')});
+t('Unverhältnismäßigkeit → Abs. 2 rechnet mit Abs.-2-Regeln',()=>{const c=a.evaluate(proj({general:{caseType:'unverh',uvBuilt:'ja',uv1:'nein',uv2:'ja'},building:{chimney:'6.9'}}));assert.equal(c.case.type,'bestand');assert.equal(c.roof.status,'ok');assert.equal(c.lai.status,'nicht erforderlich')});
+t('Offene Unverhältnismäßigkeit bleibt offen',()=>assert.equal(a.evaluate(proj({general:{caseType:'unverh'}})).overall,'offen'));
+t('Wartung/Reparatur: § 19 nicht anzuwenden, Kurzbericht passend',()=>{const p=proj({general:{caseType:'keine'}});const c=a.evaluate(p);assert.equal(c.overall,'nicht erforderlich');assert.match(a.reportHTML(p,c),/Keine Anpassung nach § 19 erforderlich/)});
+t('Kurzbericht nennt den Fall statt „Bestandsanlage“',()=>{const p=proj({general:{caseType:'bestand'}});const html=a.reportHTML(p,a.evaluate(p));assert.match(html,/Austausch/);assert(!/Bestandsanlage/.test(html))});
+t('Quittierter Migrationshinweis fehlt im Kurzbericht, bleibt im ausführlichen Bericht',()=>{let p=proj();p.migrationNotice='Altprojekt prüfen';p.migrationAck=true;p=a.normalizeProject(p);assert.equal(p.migrationAck,true);const c=a.evaluate(p);assert(!/Altprojekt prüfen/.test(a.reportHTML(p,c)));assert.match(a.detailedReportHTML(p,c),/quittiert/)});
+t('Berichte ohne NaN/undefined',()=>{const p=proj({neighbors:[nb()],openings:[{id:'o',type:'Fenster',building:'Nr 55',distance:'12',top:'6'}]});const c=a.evaluate(p);for(const h of [a.reportHTML(p,c),a.detailedReportHTML(p,c)])assert(!/NaN|undefined/.test(h))});
+t('Einzeldatei identisch mit index.html',()=>{assert(single,'Einzeldatei fehlt');assert.equal(fs.readFileSync(__dirname+'/'+single,'utf8'),html)});
+console.log('BESTANDEN:',count,'Fälle');

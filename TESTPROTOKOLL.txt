@@ -1,0 +1,20 @@
+TESTPROTOKOLL – AbleitCheck V3.7 (19.10.2026)
+
+Rechen- und Berichtstests (node tests.cjs): 49 bestanden
+- 27 bisherige Tests (Dachwinkel, Viertelkreis, Migration) unverändert bestanden
+- 22 neue Tests, u. a.:
+  · Öffnungsregeln Abs. 1 (alle Leistungsstufen) und Abs. 2 (15 m + 2 m je angefangene 50 kW, max. 40 m)
+  · Öffnung genau auf der Radiusgrenze
+  · Firstnähe Abs. 1, Dachalternativen Abs. 2 (1,00 m / 2,30 m)
+  · Flachdach Abs. 1 nach Schulung Übung 3 (33 × 44 m, 14 m hoch)
+  · Satteldach 5° nach Frühjahrsweiterbildung 2022
+  · Übungsdaten Schulung Übung 6: Dachneigungen aller fünf Häuser, Haus 5 (Δh +1,7 m → VDI), Haus 1 (Δh −2,1 m → positiv)
+  · Prüfschritt 1 positiv + Kreis innen → Grenzfall
+  · Unverhältnismäßigkeit: alle Pfade der LIV-Prüffolge 2023
+  · Wartung/Reparatur, Fallbezeichnung im Kurzbericht, quittierter Migrationshinweis
+  · Berichte ohne NaN/undefined, Einzeldatei identisch mit index.html
+
+Browser-Test (Chromium headless, 1366 × 900 und 810 × 1080):
+Import Testprojekt, Migrationshinweis quittieren, Unverhältnismäßigkeitsfragen, Nachbarseite, Berichtsvorschau – keine JavaScript-Fehler, kein seitlicher Überlauf.
+
+Nicht durchgeführt: echter iPad-/Safari-Test, PDF-Druck auf dem iPad, HTTPS-Betrieb.

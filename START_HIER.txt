@@ -1,0 +1,38 @@
+ABLEITCHECK V3.7 – START
+
+WINDOWS
+AbleitCheck_V3_7.html im Browser öffnen (Edge oder Chrome). Funktioniert ohne Internet.
+PDF: Prüfbericht → „Abschlussbericht · PDF / Drucken“ → Als PDF speichern. A4, 100 %, Kopf-/Fußzeilen aus.
+
+IPAD
+Das ganze Paket über HTTPS bereitstellen (z. B. GitHub Pages), index.html in Safari einmal online öffnen und über Teilen → „Zum Home-Bildschirm“ installieren. Nur so ist die App offline nutzbar und die Daten sind vor dem automatischen Löschen durch Safari geschützt. Eine Hosting-Adresse ist noch nicht eingerichtet; ein echter iPad-Test steht weiterhin aus.
+
+DATEN
+Daten liegen nur im jeweiligen Browser. Vor jedem Versionswechsel „Daten sichern“ (JSON) ausführen. Die App zeigt links unten, wann zuletzt gesichert wurde, und warnt nach 7 Tagen.
+
+WAS IST NEU IN V3.7 (gegenüber V3.6)
+Fachlich – geprüft gegen § 19 1. BImSchV (Stand 19.10.2026), LIV-Arbeitshilfe 07.06.2023 und die Schulungsunterlagen LIV BW / STS:
+- Anwendungsfall: neue Auswahl „Bestandsgebäude – Unverhältnismäßigkeit prüfen“ mit der Prüffolge aus der LIV-Arbeitshilfe 2023 (Fragen 0–4). Das Ergebnis führt automatisch zu den Regeln von Abs. 1 oder Abs. 2.
+- Neue Auswahl „Wartung / Reparatur / Instandsetzung“: § 19 nicht anzuwenden, eigener Kurzbericht.
+- Hinweise zur Abgrenzung Abs. 1 / Abs. 2 nach der LIV-Arbeitshilfe 2023.
+- Abs. 1, Flachdach: wird jetzt berechnet (fiktiver 20°-First aus Attika-/Traufhöhe und Schmalseite b, a = 0, Überragung ≥ 0,40 m – Schulung Übung 3).
+- Abs. 1, Satteldach unter 20°: Firstnähe am realen First, Überragung auf den fiktiven 20°-First (Beispiel Frühjahrsweiterbildung 2022). Bisher nur „Einzelprüfung“.
+- Prüfschritt 1 positiv, ergänzender Viertelkreis zeigt die Mündung innen: jetzt „Grenzfall / nachprüfen“ statt grün (Schulung Folie 16/19).
+- Δh: Bezugspunkt ergänzt – Fußpunkt des Lots unter dem First, bei symmetrischen Dächern Mitte Giebelseite (Schulung Folie 43).
+Bedienung und Bericht:
+- Migrationshinweis kann als geprüft quittiert werden; er verschwindet dann aus Kurzbericht und Seitenkopf, bleibt aber im ausführlichen Bericht dokumentiert.
+- Kurzbericht nennt den tatsächlichen Anwendungsfall statt „Neuanlage/Bestandsanlage“.
+- Einheitliche Versionsnummer 3.7 in App, Berichten, Manifest, Service Worker und Arbeitshilfen.
+- Sicherungserinnerung, iPad-Hinweis, Anfrage auf dauerhaften Browserspeicher.
+- Kleinere Korrekturen: Farbe für „nicht relevant“, verständlichere Fehlermeldungen, Achsbeschriftung der Viertelkreisgrafik, ungenutzter Code entfernt.
+
+UNVERÄNDERT
+Viertelkreisfaktoren (Folie 21 / Tabelle 1 – bestätigt), Öffnungsregeln Abs. 1 und 2, Datenbankschema und Import/Export. Alte Sicherungen lassen sich weiter laden.
+
+FÜR ÄNDERUNGEN AN DER APP
+index.html ist die einzige Quelldatei. Danach:
+  node build.cjs   → erzeugt AbleitCheck_V3_7.html und prüft die Versionsangaben
+  node tests.cjs   → 49 Rechen- und Berichtstests
+
+GRENZEN
+Keine VDI-3781-Vollberechnung, keine Sonderdachformen (Pult, Shed, Walm, Mansarde, asymmetrisch) und keine Dachaufbauten in der Automatik. Der Bericht ist keine Bescheinigung oder Abnahme. In Zweifelsfällen Rücksprache mit der zuständigen Behörde.
