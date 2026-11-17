@@ -1,4 +1,14 @@
-TESTPROTOKOLL – AbleitCheck V3.8 (17.11.2026)
+TESTPROTOKOLL – AbleitCheck V3.9 (17.11.2026)
+
+V3.9: Stellung der Nachbargebäude und Luftbild-Bestimmung
+- node tests.cjs: 102 bestanden (12 neu: Geometrie β/d/Tiefe aus Luftbildpunkten, Eckenreihenfolge,
+  Warnung Rückseite, Stellung Giebel/Traufe/unbekannt/schräg in l_eff, Altprojekt-Übernahme, Quellenangabe im Bericht)
+- Browser-Test Luftbild-Dialog (Chrome headless, iPad- und PC-Größe, Luftbild durch Testbild ersetzt):
+  Antippen Schornstein + 2 Ecken + Rückseite → β 90° ± 1°, d/Seite/Tiefe auf ± 0,2 m (Pixelraster),
+  Übernehmen in die Nachbarkarte, Schornstein beim zweiten Aufruf gemerkt, Zoom, Abbrechen – keine Fehler
+- Hinweis: Echtes DOP20-Bild wurde in V3.8-Vorarbeiten live von mo18480.github.io abgerufen (CORS ok, scharf).
+
+--- V3.8 ---
 
 Neu: Berechnung nach VDI 3781 Blatt 4 (2017-07, bestätigt 2023), eigene Umsetzung der Rechenformeln.
 

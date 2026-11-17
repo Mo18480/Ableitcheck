@@ -1,7 +1,7 @@
-ABLEITCHECK V3.8 – START
+ABLEITCHECK V3.9 – START
 
 WINDOWS
-AbleitCheck_V3_8.html im Browser öffnen (Edge oder Chrome). Funktioniert ohne Internet.
+AbleitCheck_V3_9.html im Browser öffnen (Edge oder Chrome). Funktioniert ohne Internet.
 PDF: Prüfbericht → „Abschlussbericht · PDF / Drucken“ → Als PDF speichern. A4, 100 %, Kopf-/Fußzeilen aus.
 
 IPAD
@@ -10,7 +10,19 @@ Das ganze Paket über HTTPS bereitstellen (z. B. GitHub Pages), index.html in Sa
 DATEN
 Daten liegen nur im jeweiligen Browser. Vor jedem Versionswechsel „Daten sichern“ (JSON) ausführen. Die App zeigt links unten, wann zuletzt gesichert wurde, und warnt nach 7 Tagen.
 
-WAS IST NEU IN V3.8 (gegenüber V3.6)
+WAS IST NEU IN V3.9
+- Nachbargebäude: neue Auswahl „Stellung zum Schornstein“ (unbekannt / Giebelseite / Traufseite / schräg).
+  Giebel- oder Traufseite gerade gegenüber = 90°; nur bei „schräg“ wird der Winkel β abgefragt.
+  „Unbekannt“ bleibt zulässig und rechnet vorsichtig.
+- Knopf „Im Luftbild bestimmen“: Luftbild DOP20 des LGL (100 × 100 m um die Objektadresse).
+  Schornstein antippen, zwei Ecken der zugewandten Seite, optional eine Ecke der Rückseite.
+  Die App berechnet β, Abstand d, Länge der Seite und Gebäudetiefe und trägt sie ein.
+  Bereits eingetragene Maße werden nicht überschrieben; Abweichungen > 1 m werden angezeigt.
+  Der Schornstein wird gemerkt und muss beim nächsten Nachbarn nicht erneut angetippt werden.
+- Bericht: Stellung je Nachbar und Quellenangabe Luftbild (Datenlizenz Deutschland – Namensnennung 2.0).
+- Altprojekte mit eingetragenem β werden automatisch auf „schräg“ gesetzt.
+
+WAS WAR NEU IN V3.8 (gegenüber V3.6)
 Fachlich – geprüft gegen § 19 1. BImSchV (Stand 19.10.2026), LIV-Arbeitshilfe 07.06.2023 und die Schulungsunterlagen LIV BW / STS:
 - Anwendungsfall: neue Auswahl „Bestandsgebäude – Unverhältnismäßigkeit prüfen“ mit der Prüffolge aus der LIV-Arbeitshilfe 2023 (Fragen 0–4). Das Ergebnis führt automatisch zu den Regeln von Abs. 1 oder Abs. 2.
 - Neue Auswahl „Wartung / Reparatur / Instandsetzung“: § 19 nicht anzuwenden, eigener Kurzbericht.
@@ -22,7 +34,7 @@ Fachlich – geprüft gegen § 19 1. BImSchV (Stand 19.10.2026), LIV-Arbeitshilf
 Bedienung und Bericht:
 - Migrationshinweis kann als geprüft quittiert werden; er verschwindet dann aus Kurzbericht und Seitenkopf, bleibt aber im ausführlichen Bericht dokumentiert.
 - Kurzbericht nennt den tatsächlichen Anwendungsfall statt „Neuanlage/Bestandsanlage“.
-- Einheitliche Versionsnummer 3.8 in App, Berichten, Manifest, Service Worker und Arbeitshilfen.
+- Einheitliche Versionsnummer 3.9 in App, Berichten, Manifest, Service Worker und Arbeitshilfen.
 - Sicherungserinnerung, iPad-Hinweis, Anfrage auf dauerhaften Browserspeicher.
 - Kleinere Korrekturen: Farbe für „nicht relevant“, verständlichere Fehlermeldungen, Achsbeschriftung der Viertelkreisgrafik, ungenutzter Code entfernt.
 
@@ -31,7 +43,7 @@ Viertelkreisfaktoren (Folie 21 / Tabelle 1 – bestätigt), Öffnungsregeln Abs.
 
 FÜR ÄNDERUNGEN AN DER APP
 index.html ist die einzige Quelldatei. Danach:
-  node build.cjs   → erzeugt AbleitCheck_V3_8.html und prüft die Versionsangaben
+  node build.cjs   → erzeugt AbleitCheck_V3_9.html und prüft die Versionsangaben
   node tests.cjs   → 49 Rechen- und Berichtstests
 
 GRENZEN

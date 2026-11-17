@@ -100,6 +100,7 @@ t('Berichte mit VDI ohne NaN/undefined',()=>{const p=a1x3(10.8);const c=a.evalua
 t('Absender je Tätigkeit: hoheitlich (Standard) und Meisterbetrieb',()=>{const p=proj();const h=a.reportHTML(p,a.evaluate(p));assert.match(h,/Bevollmächtigter Bezirksschornsteinfeger/);assert.match(h,/Unterschrift des bevollmächtigten/);p.general.role='frei';const f=a.reportHTML(p,a.evaluate(p));assert.match(f,/Schornsteinfegermeisterbetrieb/);assert(!/Bevollmächtigter Bezirksschornsteinfeger/.test(f));assert.match(f,/Unterschrift des Schornsteinfegers/);assert.match(a.detailedReportHTML(p,a.evaluate(p)),/Freie Tätigkeit/)});
 // ===== Geländehöhen (DGM1 LGL-BW) =====
 const B64_1='TU0AKgAAAAgAFAD+AAQAAAABAAAAAAEAAAMAAAABAAQAAAEBAAMAAAABAAUAAAECAAMAAAABABAAAAEDAAMAAAABAAEAAAEGAAMAAAABAAEAAAERAAQAAAABAAACPgEVAAMAAAABAAEAAAEWAAMAAAABAAUAAAEXAAQAAAABAAAAKAEaAAUAAAABAAABAAEbAAUAAAABAAABCAEoAAMAAAABAAEAAAFTAAMAAAABAAEAAIMOAAwAAAADAAABEISCAAwAAAAGAAABKIevAAMAAABMAAABWIewAAwAAAAGAAAB8IexAAIAAAAeAAACIKSBAAIAAAACMAAAAAAAAAAAAAAAAAEAAAABAAAAAQAAAAE/9AAAAAAAAD/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBHYGuZmZmZkFUvYkzMzMzAAAAAAAAAAAAAQABAAIAEgQAAAAAAQABBAEAAAABAAEIAAAAAAEQoggBh7EABwAACAIAAAABf/8IAwAAAAEixQgGAAAAASOOCAgAAAABG2sMAAAAAAFk6AwBh7EAFgAHDAMAAAABAAEMBAAAAAEjKQwIh7AAAQAADAmHsAABAAEMCoewAAEAAgwLh7AAAQADDBCHsAABAAQMFIewAAEABUAiAAAAAAAAAAAAAAAAAABBHoSAAAAAAAAAAAAAAAAAQCIAAAAAAAA/7/y5I6KceEVUUkY4OXxFVFJGODkgLyBVVE0gem9uZSAzMk58AAC5ALkAuAC4ALkAuQC4ALgAuQC5ALkAuAC5ALkAuQC4ALkAuQC5ALg=';
+// V3.9: Stellung und Luftbild am Ende
 const B64_2=B64_1.replace('BBHYGuZmZmZk','BBHYImZmZmZk').replace(/AAC5ALkAuAC4ALkAuQC4ALgAuQC5ALkAuAC5ALkAuQC4ALkAuQC5ALg=$/,'AAC3ALcAtwC3ALcAtwC3ALcAtwC3ALcAtwC3ALcAtwC3ALcAtwC3ALc=');
 const tif=b=>new Uint8Array(Buffer.from(b,'base64'));
 t('UTM32: Mittelmeridian 9° Ost → E = 500 000 m',()=>{const [E,N]=a.toUTM32(49,9);near(E,500000,0.001);near(N,5427455.78,0.01)});
@@ -108,4 +109,18 @@ t('DGM1-Antwort des LGL (GeoTIFF, Int16) wird gelesen und gemittelt',()=>{const 
 t('Δh zweier DGM1-Punkte (183 m − 184,65 m = −1,65 m)',()=>near(a.dgmMean(a.readTiff(tif(B64_2)))-a.dgmMean(a.readTiff(tif(B64_1))),-1.65,0.001));
 t('Keine TIFF-Antwort → verständlicher Fehler',()=>assert.throws(()=>a.readTiff(new Uint8Array(Buffer.from('<ows:ExceptionReport/>'))),/Keine TIFF/));
 t('Nachbaradresse: PLZ und Ort aus der Objektadresse ergänzt',()=>{assert.equal(a.neighborQuery('Musterweg 5','Musterweg 3, 89077 Ulm'),'Musterweg 5, 89077 Ulm');assert.equal(a.neighborQuery('Bahnhofstr. 1, 75038 Oberderdingen','Musterweg 3, 89077 Ulm'),'Bahnhofstr. 1, 75038 Oberderdingen');assert.equal(a.neighborQuery('','x'),'')});
+// ===== Stellung und Luftbild =====
+t('Luftbild: Schornstein gerade vor der Wand → β 90°, d 10 m, Seite 10 m, Tiefe 8 m',()=>{const g=a.aerialGeometry([0,0],[-5,10],[5,10],[0,18]);near(g.beta,90,1e-9);near(g.d,10,1e-9);near(g.wall,10,1e-9);near(g.depth,8,1e-9);assert.equal(g.warnBackside,false)});
+t('Luftbild: schräg gegenüber → β über Wandmitte (atan 10/15), Abstand zur nächsten Ecke',()=>{const g=a.aerialGeometry([0,0],[10,10],[20,10],null);near(g.beta,Math.atan2(10,15)*180/Math.PI,1e-9);near(g.d,Math.hypot(10,10),1e-9);assert.equal(g.depth,null)});
+t('Luftbild: Reihenfolge der Ecken egal, β bleibt ≤ 90°',()=>{const g1=a.aerialGeometry([0,0],[10,10],[20,10]),g2=a.aerialGeometry([0,0],[20,10],[10,10]);near(g1.beta,g2.beta,1e-9);assert(g1.beta<=90)});
+t('Luftbild: Rückseitenpunkt auf Schornsteinseite → Warnung',()=>assert.equal(a.aerialGeometry([0,0],[-5,10],[5,10],[0,4]).warnBackside,true));
+t('Luftbild: zu kurze Wand → Fehler',()=>assert.throws(()=>a.aerialGeometry([0,0],[1,1],[1.2,1.1]),/zu nah/));
+{const base={...a.blankNeighbor(),kind:'einzel',roof:'sattel',gable:'8',length:'14',eaves:'6',ridge:'10',distance:'6',delta:'0'};
+t('Stellung Giebelseite → l_eff = Giebelbreite',()=>near(a.vdiUpstream({...base,orient:'giebel'},10.4,.4).leff,8,1e-9));
+t('Stellung Traufseite → l_eff = Gebäudelänge',()=>near(a.vdiUpstream({...base,orient:'trauf'},10.4,.4).leff,14,1e-9));
+t('Stellung unbekannt → vorsichtig mit Diagonale',()=>near(a.vdiUpstream({...base,orient:''},10.4,.4).leff,Math.hypot(8,14),1e-9));
+t('Stellung schräg 30°, Traufseite zugewandt → l·sinβ + b·cosβ',()=>near(a.vdiUpstream({...base,orient:'schraeg',beta:'30',facing:'trauf'},10.4,.4).leff,14*.5+8*Math.cos(Math.PI/6),1e-9));
+t('Stellung Giebel ergibt kleinere Zone als unbekannt',()=>assert(a.vdiUpstream({...base,orient:'giebel'},10.4,.4).lRZ<a.vdiUpstream({...base,orient:''},10.4,.4).lRZ));}
+t('Altprojekt mit β → Stellung „schräg“',()=>{const p=proj({neighbors:[{...nb(),beta:'60',facing:'trauf'}]});delete p.neighbors[0].orient;a.evaluate(p);assert.equal(p.neighbors[0].orient,'schraeg')});
+t('Bericht zeigt Luftbild-Quelle, wenn verwendet',()=>{const p=a1x3(10.8);p.neighbors[0].aerialInfo='Luftbild: β 80°';const h=a.detailedReportHTML(p,a.evaluate(p));assert.match(h,/DOP20 LGL-BW/);assert.match(h,/Stellung:/);assert(!/NaN|undefined/.test(h))});
 console.log('BESTANDEN:',count,'Fälle');if(failed.length){console.log('FEHLGESCHLAGEN:',failed.length);process.exit(1);}
