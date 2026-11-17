@@ -1,11 +1,11 @@
 {
-  "name": "AbleitCheck V3.7 – Ableitbedingungen",
+  "name": "AbleitCheck V3.8 – Ableitbedingungen",
   "short_name": "AbleitCheck",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f3f6fa",
   "theme_color": "#172c40",
-  "description": "Offlinefähige Vorprüfung der Ableitbedingungen: automatisch berechnete Dachneigung und maßstäbliche Viertelkreis-Grafik.",
+  "description": "Offlinefähige Prüfung der Ableitbedingungen nach § 19 1. BImSchV, LAI und VDI 3781 Blatt 4.",
   "icons": [
     {
       "src": "./icon-192.png",

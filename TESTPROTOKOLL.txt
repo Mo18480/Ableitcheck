@@ -1,20 +1,22 @@
-TESTPROTOKOLL – AbleitCheck V3.7 (19.10.2026)
+TESTPROTOKOLL – AbleitCheck V3.8 (17.11.2026)
 
-Rechen- und Berichtstests (node tests.cjs): 49 bestanden
-- 27 bisherige Tests (Dachwinkel, Viertelkreis, Migration) unverändert bestanden
-- 22 neue Tests, u. a.:
-  · Öffnungsregeln Abs. 1 (alle Leistungsstufen) und Abs. 2 (15 m + 2 m je angefangene 50 kW, max. 40 m)
-  · Öffnung genau auf der Radiusgrenze
-  · Firstnähe Abs. 1, Dachalternativen Abs. 2 (1,00 m / 2,30 m)
-  · Flachdach Abs. 1 nach Schulung Übung 3 (33 × 44 m, 14 m hoch)
-  · Satteldach 5° nach Frühjahrsweiterbildung 2022
-  · Übungsdaten Schulung Übung 6: Dachneigungen aller fünf Häuser, Haus 5 (Δh +1,7 m → VDI), Haus 1 (Δh −2,1 m → positiv)
-  · Prüfschritt 1 positiv + Kreis innen → Grenzfall
-  · Unverhältnismäßigkeit: alle Pfade der LIV-Prüffolge 2023
-  · Wartung/Reparatur, Fallbezeichnung im Kurzbericht, quittierter Migrationshinweis
-  · Berichte ohne NaN/undefined, Einzeldatei identisch mit index.html
+Neu: Berechnung nach VDI 3781 Blatt 4 (2017-07, bestätigt 2023), eigene Umsetzung der Rechenformeln.
 
-Browser-Test (Chromium headless, 1366 × 900 und 810 × 1080):
-Import Testprojekt, Migrationshinweis quittieren, Unverhältnismäßigkeitsfragen, Nachbarseite, Berichtsvorschau – keine JavaScript-Fehler, kein seitlicher Überlauf.
+Rechen- und Berichtstests (node tests.cjs): 83 bestanden
+- 51 bisherige Tests; 3 davon an gewollte Änderungen angepasst
+  (Pultdach jetzt rechenbar, > 200 kW nach VDI-Tabelle 3, neuer VDI-Abschlusssatz)
+- 32 neue Tests, Sollwerte aus den Rechenbeispielen der Richtlinie (auf 0,1 m gerundet):
+  · Tab. 1/2/3 (Zuschlag H_Ü, γ/f interpoliert, Einwirkungsbereich R und H_S)
+  · Anhang A1 (= Schulung Übung 6, Haus 1–5): H_A1 0,4/2,8 m; Tab. A3 H2,V aller Häuser;
+    Tab. A4–A6 l_eff, l_RZ, H_S2, H_A2 für X1–X3; Hanglage Haus 5 → 2,0 m bzw. 4,7 m;
+    Haus 1 tiefer → entfällt; Verdünnung H_E 0,9 m; Gesamtergebnis H_M 4,7 m
+  · Anhang A2: Flachdach 3,1 m; Dachaufbau 5,8/5,0 m bzw. außerhalb; Pultdach 25° und 17°;
+    Sheddach 3,9 m; Walmdach 0,8 m / 1,1 m
+  · § 19 Abs. 1 Satz 4 (Einzelgebäude nach 6.2.1 als Alternative), Kappung doppelte Gebäudehöhe,
+    geschlossene Bauweise, fehlende Angaben, Altprojekte ohne neue Felder, Berichte ohne NaN
 
-Nicht durchgeführt: echter iPad-/Safari-Test, PDF-Druck auf dem iPad, HTTPS-Betrieb.
+Browser-Test (Chrome headless, 810 × 1080 und 1366 × 900):
+Import Testprojekt (A1, Position X3), alle Seiten, Tippen im Winkelfeld (Fokus bleibt),
+Erläuterung per i-Knopf – keine JavaScript-Fehler, kein seitlicher Überlauf.
+
+Nicht durchgeführt: echter iPad-/Safari-Test, PDF-Druck auf dem iPad.
