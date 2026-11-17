@@ -2,7 +2,7 @@ TESTPROTOKOLL – AbleitCheck V3.8 (17.11.2026)
 
 Neu: Berechnung nach VDI 3781 Blatt 4 (2017-07, bestätigt 2023), eigene Umsetzung der Rechenformeln.
 
-Rechen- und Berichtstests (node tests.cjs): 83 bestanden
+Rechen- und Berichtstests (node tests.cjs): 84 bestanden (inkl. Briefkopf hoheitlich / Meisterbetrieb)
 - 51 bisherige Tests; 3 davon an gewollte Änderungen angepasst
   (Pultdach jetzt rechenbar, > 200 kW nach VDI-Tabelle 3, neuer VDI-Abschlusssatz)
 - 32 neue Tests, Sollwerte aus den Rechenbeispielen der Richtlinie (auf 0,1 m gerundet):
@@ -18,5 +18,7 @@ Rechen- und Berichtstests (node tests.cjs): 83 bestanden
 Browser-Test (Chrome headless, 810 × 1080 und 1366 × 900):
 Import Testprojekt (A1, Position X3), alle Seiten, Tippen im Winkelfeld (Fokus bleibt),
 Erläuterung per i-Knopf – keine JavaScript-Fehler, kein seitlicher Überlauf.
+
+Prüfprotokoll (Kurzbericht) im Stil der KÜO-Anlage-2-Bescheinigung: als PDF erzeugt, passt auf eine A4-Seite.
 
 Nicht durchgeführt: echter iPad-/Safari-Test, PDF-Druck auf dem iPad.
