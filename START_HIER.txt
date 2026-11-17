@@ -21,6 +21,11 @@ WAS IST NEU IN V3.9
   Der Schornstein wird gemerkt und muss beim nächsten Nachbarn nicht erneut angetippt werden.
 - Bericht: Stellung je Nachbar und Quellenangabe Luftbild (Datenlizenz Deutschland – Namensnennung 2.0).
 - Altprojekte mit eingetragenem β werden automatisch auf „schräg“ gesetzt.
+- „Sicherung laden“ gleicht jetzt ab statt zu verdoppeln: neue Prüfobjekte kommen hinzu, vorhandene werden nur
+  durch eine neuere Fassung ersetzt (vorher Rückfrage mit Liste), gleiche oder ältere bleiben unverändert.
+  Damit lässt sich zwischen iPad und PC über die Sicherungsdatei abgleichen.
+  Wurde dasselbe Objekt auf beiden Geräten geändert, gilt die zuletzt geänderte Fassung.
+- Handy: Protokoll-Vorschau seitlich scrollbar, Luftbild-Dialog angepasst.
 
 WAS WAR NEU IN V3.8 (gegenüber V3.6)
 Fachlich – geprüft gegen § 19 1. BImSchV (Stand 19.10.2026), LIV-Arbeitshilfe 07.06.2023 und die Schulungsunterlagen LIV BW / STS:

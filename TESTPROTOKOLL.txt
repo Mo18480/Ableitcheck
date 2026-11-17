@@ -1,5 +1,47 @@
 TESTPROTOKOLL – AbleitCheck V3.9 (17.11.2026)
 
+Letzte Kontrolle vor dem Update 17.11.2026 (Übergang von V3.8, Sicherungen, Service Worker):
+- Test über einen echten Webserver: gespeicherte V3.8-Daten im Browser → werden übernommen (β → „schräg“), keine Fehler.
+- Gefunden und behoben: Sicherungsdateien aus V3.8 verloren beim Laden die Stellung (β wurde nicht mehr verwendet).
+- Gefunden und behoben: ein Prüfobjekt ohne Änderungsdatum hätte die Projektliste leer bleiben lassen.
+- Service Worker: lädt die neue Fassung jetzt am Browser-Zwischenspeicher vorbei und aktiviert sie beim nächsten Öffnen;
+  getestet: Update kommt nach dem zweiten Öffnen an, alter Zwischenspeicher gelöscht, Daten bleiben erhalten.
+- node tests.cjs 113 bestanden; alle Browsertests ohne Fehler.
+
+Dritte Kontrolle 17.11.2026 (alle Änderungen seit V3.8 Zeile für Zeile, Zusammenspiel der Funktionen):
+Gefunden und behoben:
+- Stellung „Unbekannt“: ein früher eingegebener Winkel β wurde trotzdem verwendet, und die Auswahl sprang auf „schräg“ zurück.
+  Jetzt rechnet „Unbekannt“ immer vorsichtig; β zählt nur bei „schräg“.
+- Objektadresse geändert: Geländehöhe, Luftbildausschnitt und Schornsteinpunkt der alten Adresse wurden weiterverwendet.
+  Jetzt werden sie bei Adressänderung verworfen und neu abgefragt.
+- Von Hand geänderte Werte (Δh, Nachbaradresse, Stellung, β, Abstand) behielten die Herkunftsangabe „DGM1“ bzw. „Luftbild“
+  im Bericht. Jetzt entfällt die Herkunftsangabe bei Handänderung.
+- Luftbild überschrieb einen eingetragenen Abstand ohne Hinweis; jetzt wird der vorherige Wert genannt.
+- Freie Tätigkeit: Protokoll formulierte wie eine Anordnung („sind zu beseitigen“). Jetzt Empfehlung.
+- Bericht: Stellungszeile bei Gebäudegruppe ausgeblendet (dort ohne Bedeutung).
+Tests: node tests.cjs 112 bestanden (6 neu); Browser-, Luftbild-, Abgleich-, Druck- und Zufallstests ohne Fehler.
+
+Zweite Gesamtkontrolle 17.11.2026 (mit Abgleich der Sicherung):
+- Sicherung laden = Abgleich (neu / neuere Fassung / unverändert), 4 neue Tests; Browser-Test: zweimal dieselbe Datei
+  → keine Duplikate; neuere Fassung → ersetzt nach Rückfrage; Daten nach Neuladen erhalten.
+- Browser-Zufallstest: 40 zufällige Projekte × 7 Seiten in iPad- und Handybreite – keine JS-Fehler, kein NaN/undefined.
+  Gefunden und behoben: Protokoll-Vorschau lief auf Handybreite seitlich über.
+- Luftbild-Dialog zusätzlich in Handybreite getestet (Kopfzeile springt nicht mehr zwischen den Schritten).
+- Druck: beide Testprojekte je genau eine A4-Seite.
+- Gefunden in den Testskripten: Rückfragen wurden automatisch abgelehnt – korrigiert, alle Browser-Tests wiederholt.
+- node tests.cjs: 107 bestanden.
+
+Gesamtprüfung 17.11.2026 (Rechtsgrundlagen und Code):
+- § 19 Abs. 1 Satz 1–7 und Abs. 2 Satz 1–3 mit aktuellem Wortlaut (gesetze-im-internet.de) abgeglichen:
+  Firstnähe, 0,40 m, fiktiver 20°-First (< 20°), Satz 4 VDI 6.2.1, Öffnungstabelle (15/1, 17/2, 19/3, 21/3 m,
+  > 200 kW VDI Tab. 3), Satz 6 VDI mit Bebauung/Hanglage, Satz 7 Abs. 2 bei Unverhältnismäßigkeit,
+  Abs. 2 Nr. 1 (≤ 20°: 0,40 m oder 1 m; > 20°: 0,40 m oder 2,30 m horizontal), Nr. 2 (15 m + 2 m je 50 kW, max. 40 m, 1 m) – korrekt umgesetzt.
+- Korrigiert: Bei unvollständigen VDI-Angaben wurde ein Teilwert als Mindesthöhe angezeigt (konnte zu niedrig sein). Jetzt erst bei vollständigen Angaben.
+- Ergänzt: Hinweise „nur feste Brennstoffe“, wesentliche Änderung nach § 2 Nr. 16, Genehmigungsbedürftigkeit (§ 1 Abs. 1).
+- Zufallstest: 4000 zufällige Projekte – keine Abstürze, kein NaN/undefined in den Berichten.
+- Build prüft jetzt auch die sichtbare Versionsnummer.
+- node tests.cjs: 103 bestanden; Browser-, Luftbild- und Drucktest ohne Fehler.
+
 V3.9: Stellung der Nachbargebäude und Luftbild-Bestimmung
 - node tests.cjs: 102 bestanden (12 neu: Geometrie β/d/Tiefe aus Luftbildpunkten, Eckenreihenfolge,
   Warnung Rückseite, Stellung Giebel/Traufe/unbekannt/schräg in l_eff, Altprojekt-Übernahme, Quellenangabe im Bericht)

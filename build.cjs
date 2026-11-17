@@ -8,4 +8,7 @@ for(const f of fs.readdirSync(dir))if(/^AbleitCheck_V[\d_]+\.html$/.test(f)&&f!=
 fs.writeFileSync(path.join(dir,target),html);
 const check={'manifest.webmanifest':`V${v}`,'sw.js':target,'Arbeitshilfen.html':`ABLEITCHECK ${v}`};
 for(const [f,needle] of Object.entries(check))if(!fs.readFileSync(path.join(dir,f),'utf8').includes(needle))throw Error(`${f}: Version ${v} fehlt`);
+// Keine abweichende Versionsnummer im sichtbaren Text (z. B. Kopfzeile)
+const stale=[...html.matchAll(/AbleitCheck (\d+\.\d+)/g)].map(m=>m[1]).filter(x=>x!==v);
+if(stale.length)throw Error('index.html enthält alte Versionsnummer(n): '+[...new Set(stale)].join(', '));
 console.log('Erzeugt:',target);
